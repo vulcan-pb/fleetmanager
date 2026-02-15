@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HMI_High_Legibility</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@800&family=Roboto+Condensed:wght@700&family=Roboto:wght@900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hmi-bg: #000000;
+            --panel-bg: #111418;
+            --grid-line: #2d333d;
+            --mains-ok: #00ff88;
+            --mains-fail: #ff3333;
+            --dg-run: #bc66ff;
+            --dg-standby: #3a414a;
+            --stat-off: #1c2128;
+            --stat-safe: #00ab66;
+            --font-label: 'Roboto Condensed', sans-serif;
+            --font-value: 'JetBrains Mono', monospace;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background: #000;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; font-family: var(--font-label);
+            user-select: none; -webkit-user-select: none;
+            overflow: hidden; touch-action: none;
+        }
+
+        .hmi-screen {
+            width: 272px; height: 480px;
+            background: var(--hmi-bg);
+            border: 2px solid #333;
+            display: flex; flex-direction: column;
+        }
+
+        .hmi-header {
+            height: 40px; background: #000;
+            border-bottom: 2px solid #2563eb;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .hmi-title { color: #fff; font-size: 11px; letter-spacing: 2px; font-weight: 900; }
+
+        .matrix {
+            flex: 1; display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 2px; background: var(--grid-line);
+        }
+
+        .slot {
+            background: var(--panel-bg);
+            position: relative;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+
+        .status-bar {
+            position: absolute; top: 8px;
+            width: 90%;
+            display: flex; justify-content: space-between;
+        }
+
+        .indicator-pill {
+            display: flex; align-items: center;
+            background: #000; padding: 3px 6px;
+            border-radius: 4px; border: 1px solid #333; gap: 5px;
+        }
+
+        .led-name { font-size: 10px; color: #ffffff; font-weight: 700; text-transform: uppercase; }
+        
+        .led {
+            width: 12px; height: 12px; border-radius: 2px;
+            border: 1px solid #000; box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+        }
+        
+        .m-led { background: var(--mains-fail); } /* Default Fail */
+        .d-led { background: var(--dg-standby); }
+
+        .gauge-btn {
+            width: 100px; height: 100px;
+            border-radius: 50%; border: 5px solid #000;
+            background: var(--stat-off);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: background 0.15s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-top: 15px;
+        }
+
+        .val { font-family: var(--font-value); color: #fff; font-size: 34px; pointer-events: none; }
+
+        .node-tag {
+            position: absolute; bottom: 8px;
+            color: #2563eb; font-size: 11px; font-weight: 900;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hmi-screen">
+        <div class="hmi-header"><div class="hmi-title">FLEET MONITORING</div></div>
+        <div class="matrix">
+            <div class="slot" data-dg="off">
+                <div class="status-bar">
+                    <div class="indicator-pill"><div class="led m-led"></div><span class="led-name">MAINS</span></div>
+                    <div class="indicator-pill"><span class="led-name">DG</span><div class="led d-led"></div></div>
+                </div>
+                <div class="gauge-btn" onpointerdown="handleToggle(this.parentElement)">
+                    <span class="val">--</span>
+                </div>
+                <div class="node-tag">NODE_1</div>
+            </div>
+            <div class="slot" data-dg="off">
+                <div class="status-bar">
+                    <div class="indicator-pill"><div class="led m-led"></div><span class="led-name">MAINS</span></div>
+                    <div class="indicator-pill"><span class="led-name">DG</span><div class="led d-led"></div></div>
+                </div>
+                <div class="gauge-btn" onpointerdown="handleToggle(this.parentElement)">
+                    <span class="val">--</span>
+                </div>
+                <div class="node-tag">NODE_2</div>
+            </div>
+            <div class="slot" data-dg="off">
+                <div class="status-bar">
+                    <div class="indicator-pill"><div class="led m-led"></div><span class="led-name">MAINS</span></div>
+                    <div class="indicator-pill"><span class="led-name">DG</span><div class="led d-led"></div></div>
+                </div>
+                <div class="gauge-btn" onpointerdown="handleToggle(this.parentElement)">
+                    <span class="val">--</span>
+                </div>
+                <div class="node-tag">NODE_3</div>
+            </div>
+            <div class="slot" data-dg="off">
+                <div class="status-bar">
+                    <div class="indicator-pill"><div class="led m-led"></div><span class="led-name">MAINS</span></div>
+                    <div class="indicator-pill"><span class="led-name">DG</span><div class="led d-led"></div></div>
+                </div>
+                <div class="gauge-btn" onpointerdown="handleToggle(this.parentElement)">
+                    <span class="val">--</span>
+                </div>
+                <div class="node-tag">NODE_4</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { listen } = window.__TAURI__.event;
+        const { invoke } = window.__TAURI__.core;
+
+        // Visual update helper
+        function applyVisualState(slot, state) {
+            const dLed = slot.querySelector('.d-led');
+            const circle = slot.querySelector('.gauge-btn');
+            if (state === 'on') {
+                slot.setAttribute('data-dg', 'on');
+                dLed.style.backgroundColor = 'var(--dg-run)';
+                dLed.style.boxShadow = '0 0 10px var(--dg-run)';
+                circle.style.background = 'var(--stat-safe)';
+            } else {
+                slot.setAttribute('data-dg', 'off');
+                dLed.style.backgroundColor = 'var(--dg-standby)';
+                dLed.style.boxShadow = 'none';
+                circle.style.background = 'var(--stat-off)';
+            }
+        }
+
+        // Action: User touches the circle
+        function handleToggle(slot) {
+            const node = slot.querySelector('.node-tag').innerText;
+            const currentState = slot.getAttribute('data-dg');
+            const nextState = (currentState === 'on') ? 'off' : 'on';
+            const cmd = (nextState === 'on') ? "DGON" : "DGOFF";
+
+            // Optimistic update
+            applyVisualState(slot, nextState);
+
+            // Send to NODE_X/output
+            invoke('publish_mqtt', { 
+                topic: `${node}/output`, 
+                payload: cmd 
+            });
+        }
+
+        // Listen for MQTT Data
+        listen('mqtt-data', (event) => {
+            const { topic, message } = event.payload;
+            if (!topic.endsWith('/input')) return;
+
+            const nodeName = topic.split('/')[0];
+            const slot = Array.from(document.querySelectorAll('.slot'))
+                              .find(s => s.querySelector('.node-tag').innerText === nodeName);
+            
+            if (!slot) return;
+
+            // 1. Check for Numbers (Status updates)
+            if (!isNaN(message) && message.trim() !== "") {
+                slot.querySelector('.val').innerText = message;
+            } 
+            // 2. Check for Commands
+            else {
+                switch(message) {
+                    case "MAINSON":
+                        slot.querySelector('.m-led').style.backgroundColor = 'var(--mains-ok)';
+                        break;
+                    case "MAINSOFF":
+                        slot.querySelector('.m-led').style.backgroundColor = 'var(--mains-fail)';
+                        break;
+                    case "DGON":
+                        applyVisualState(slot, 'on');
+                        break;
+                    case "DGOFF":
+                        applyVisualState(slot, 'off');
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
