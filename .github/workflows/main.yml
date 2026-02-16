@@ -1,60 +1,43 @@
-name: "Publish Release"
-
+name: "publish"
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*' # Runs when you push a tag like v1.0.0
 
 jobs:
-  publish-tauri:
-    permissions:
-      contents: write
+  publish:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - platform: "windows-latest"
-            args: ""
-          - platform: "ubuntu-22.04"
-            args: "--target android"
+        platform: [windows-latest]
 
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: setup node
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: 20
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.platform == 'ubuntu-22.04' && 'aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android' || '' }}
 
-      - name: install Linux dependencies
-        if: matrix.platform == 'ubuntu-22.04'
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev patchelf
-      
-      - name: setup Android SDK
-        if: matrix.platform == 'ubuntu-22.04'
-        uses: android-actions/setup-android@v3
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: install frontend dependencies
-        # This points to your specific 'ui' folder location
-        run: |
-          cd src-tauri/ui
-          npm install
-          npm run build
+        run: npm install # Change to yarn or pnpm if necessary
 
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v__VERSION__
+          tagName: app-v__VERSION__ # the action automatically replaces this
           releaseName: "App v__VERSION__"
+          releaseBody: "See the assets below to download the Windows executable."
           releaseDraft: true
           prerelease: false
-          args: ${{ matrix.args }}
